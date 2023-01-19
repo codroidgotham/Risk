@@ -37,7 +37,7 @@ app.route("/classes").post((req: express.Request, res: express.Response) => {
         const db: mongoDB.Db = client.db("RAdatabase")
         const col: mongoDB.Collection = db.collection("Classes")
         const result = await col.insertOne(obj);
-        console.log("serviced lll request at", req.baseUrl)
+        console.log("inserted obj ", req.body)
         client.close();
         res.send(result)
     })().catch((err) => console.log)
