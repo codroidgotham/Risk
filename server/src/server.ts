@@ -44,4 +44,44 @@ app.route("/classes").post((req: express.Request, res: express.Response) => {
 
 
 })
+app.route("/classes/:id").delete((req: express.Request, res: express.Response) => {
+
+    // const {Name,classId,Confidentiality,Integrity,Availability}=req.body;
+    // const obj={"Name":Name,"classId":classId,"Confidentiality":Confidentiality,"Integrity":Integrity,"Availability":Availability};
+    
+   
+    (async function run() {
+        const client = new mongoDB.MongoClient("mongodb://127.0.0.1:27017");
+        await client.connect()
+        const db: mongoDB.Db = client.db("RAdatabase")
+        const col: mongoDB.Collection = db.collection("Classes")
+        const result = (await col.deleteOne({"classId":Number(req.params["id"])})).acknowledged
+        console.log("deleted obj ", req.params["id"])
+        client.close();
+        res.send(result)
+    })().catch((err) => console.log)
+
+
+})
+app.route('/classes/:id').patch((req,res)=>{
+    console.log("in updated")
+    const {Name,classId,Confidentiality,Integrity,Availability}=req.body;
+    const obj={"Name":Name,"Confidentiality":Confidentiality,"Integrity":Integrity,"Availability":Availability};
+    (async function run() {
+        const client = new mongoDB.MongoClient("mongodb://127.0.0.1:27017");
+        await client.connect()
+        const db: mongoDB.Db = client.db("RAdatabase")
+        const col: mongoDB.Collection = db.collection("Classes")
+        console.log("obj",obj)
+        const result = (await col.updateOne({"classId":parseInt(req.params["id"])},{$set:obj},{upsert:true})).acknowledged
+        console.log("updated obj ", req.body)
+        console.log("result",result)
+        client.close();
+        res.send(result)
+    })().catch((err) => console.log)
+
+
+})
+
+
 app.listen(9000, () => console.log("listening on 9000"))
