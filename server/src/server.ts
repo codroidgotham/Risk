@@ -226,8 +226,42 @@ app.route('/vulnerabilities').get((req: express.Request, res: express.Response) 
 })
 
 
+app.route('/risk').post((req: express.Request, res: express.Response) => {
+
+   const obj = { "ClassName":req.body.ClassName,"Threat": req.body.Threat, "Impact": req.body.Impact,
+    "Controls":req.body.Controls,"Vulnerabilities":req.body.Vulnerabilities,"Likelihood": req.body.Likelihood,"Risk":req.body.Risk };
+    console.log(obj);
+    (async function run() {
+        const client = new mongoDB.MongoClient("mongodb://127.0.0.1:27017");
+        await client.connect()
+        const db: mongoDB.Db = client.db("RAdatabase")
+        const col: mongoDB.Collection = db.collection("RiskRows")
+
+        const result = (await col.insertOne(obj)).acknowledged
+
+        client.close();
+        res.send(result)
+    })().catch((err) => console.log)
+
+})
+
+app.route('/risk').get((req: express.Request, res: express.Response) => {
 
 
+
+    (async function run() {
+        const client = new mongoDB.MongoClient("mongodb://127.0.0.1:27017");
+        await client.connect()
+        const db: mongoDB.Db = client.db("RAdatabase")
+        const col: mongoDB.Collection = db.collection("RiskRows")
+
+        const result = (await col.find({}).toArray())
+
+        client.close();
+        res.send(result)
+    })().catch((err) => console.log)
+
+})
 
 
 app.listen(9000, () => console.log("listening on 9000"))
